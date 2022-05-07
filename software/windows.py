@@ -1,5 +1,7 @@
 from common import App
 
+import json
+import subprocess
 import winreg
 
 def winreg_key_to_dict(key):
@@ -51,10 +53,26 @@ def get_apps_from_winreg():
     apps = [App(app["DisplayName"], app["Publisher"], f"{app['VersionMajor']}.{app['VersionMinor']}") for app in apps]
     return apps
 
-def run_powershell_command(admin=False):
-    pass
+def get_apps_from_app_packages():
+    """ Get all installed apps we can find from app packages (.appx) [https://docs.microsoft.com/en-us/previous-versions//hh856044(v=technet.10)?redirectedfrom=MSDN]
+    Args:
+    Returns:
+        apps (list[App]) = A list of App instances based on the app packages installed across all users
+    """
+    # Command to get the Name/Publisher/Version of all app packages in JSON format
+    POWERSHELL_COMMAND = "Get-AppxPackage -AllUsers | Select Name, Publisher, Version | ConvertTo-Json"
+    powershell_output = subprocess.run(["powershell", "-Command", POWERSHELL_COMMAND], capture_output=True)
+    apps = json.loads(powershell_output.stdout)
+    apps = [App(app["Name"], app["Publisher"], app["Version"]) for app in apps]
+    return apps
+
 
 if __name__ == '__main__':
-    apps = get_apps_from_winreg()
-    for app in apps:
+    apps_from_app_packages = get_apps_from_app_packages()
+    print("Apps from app packages:")
+    for app in apps_from_app_packages:
+        print(app)
+    apps_from_windows_registry = get_apps_from_winreg()
+    print("Apps from windows registry:")
+    for app in apps_from_windows_registry:
         print(app)

@@ -24,7 +24,7 @@ def get_apps_from_winreg():
     Returns:
         apps (list[App]) = A list of App instances for all installed apps in the Windows Registry
     """
-    APP_REQUIRED_INFO = {"DisplayName", "VersionMajor", "VersionMinor", "Publisher"}
+    APP_REQUIRED_INFO = {"DisplayName", "DisplayVersion", "Publisher"}
     """
     TODO: This doesnt seem to get all the apps. Other places to look for installed apps in the Windows Registry?
         * current user apps?
@@ -50,7 +50,7 @@ def get_apps_from_winreg():
 
     # To search for CVEs we need at least the name, version, and vendor of each app
     apps = [app for app in apps if APP_REQUIRED_INFO.issubset(set(app.keys()))]
-    apps = [App(app["DisplayName"], app["Publisher"], f"{app['VersionMajor']}.{app['VersionMinor']}") for app in apps]
+    apps = [App(app["DisplayName"], app["Publisher"], app["DisplayVersion"]) for app in apps]
     return apps
 
 def get_apps_from_app_packages():
@@ -69,10 +69,7 @@ def get_apps_from_app_packages():
 
 if __name__ == '__main__':
     apps_from_app_packages = get_apps_from_app_packages()
-    print("Apps from app packages:")
-    for app in apps_from_app_packages:
-        print(app)
+    print(f"Apps from app packages: {len(apps_from_app_packages)}")
+    
     apps_from_windows_registry = get_apps_from_winreg()
-    print("Apps from windows registry:")
-    for app in apps_from_windows_registry:
-        print(app)
+    print(f"Apps from windows registry: {len(apps_from_windows_registry)}")

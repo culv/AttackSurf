@@ -70,6 +70,10 @@ def get_apps_from_app_packages():
 if __name__ == '__main__':
     apps_from_app_packages = get_apps_from_app_packages()
     print(f"Apps from app packages: {len(apps_from_app_packages)}")
+    for app in apps_from_app_packages:
+        print(app.cpe)
     
     apps_from_windows_registry = get_apps_from_winreg()
     print(f"Apps from windows registry: {len(apps_from_windows_registry)}")
+    for app in apps_from_windows_registry:
+        print(app.cpe)
